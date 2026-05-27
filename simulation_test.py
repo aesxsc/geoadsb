@@ -2,7 +2,7 @@ import numpy as np
 from coord_math import geodetic_to_ecef, ecef_to_geodetic, calculate_elevation_angle, radio_horizon_distance
 from optimizer import estimate_receiver_position, estimate_uncertainty_bootstrap
 
-def generate_simulated_data(true_lat, true_lon, true_alt, num_tracks=10, noise_std=1.0):
+def generate_simulated_data(true_lat, true_lon, true_alt, num_tracks=10, noise_std=1.0, seed=None):
     """
     Generate synthetic ADS-B tracks relative to a true receiver position.
     """
@@ -11,7 +11,8 @@ def generate_simulated_data(true_lat, true_lon, true_alt, num_tracks=10, noise_s
     
     print(f"Generating simulation data with true position: Lat={true_lat:.6f}, Lon={true_lon:.6f}, Alt={true_alt:.1f}m")
     
-    np.random.seed(42)  # For reproducible simulation tests
+    if seed is not None:
+        np.random.seed(seed)  # Set seed for comparative testing
     
     for t_idx in range(num_tracks):
         # 1. Choose track-specific constants
@@ -102,7 +103,7 @@ def run_simulation_test():
     true_ecef = np.array(geodetic_to_ecef(true_lat, true_lon, true_alt))
     
     # Generate 50 tracks with 1.0 dB RSSI noise
-    tracks = generate_simulated_data(true_lat, true_lon, true_alt, num_tracks=50, noise_std=1.0)
+    tracks = generate_simulated_data(true_lat, true_lon, true_alt, num_tracks=50, noise_std=1.0, seed=42)
     print(f"Generated {len(tracks)} valid tracks for simulation.")
     
     # Select the top 10 tracks with the highest maximum RSSI (closest passes, highest SNR)
